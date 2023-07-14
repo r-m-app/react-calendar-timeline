@@ -158,8 +158,32 @@ $weekend: rgba(250, 246, 225, 0.5);
   }
 
   .rct-calendar-header {
-    border: 1px solid #bbb,
-
+    border: 1px solid #bbb;
   }
 
+}
+
+.rct-dependency-svg {
+  pointer-events: none;
+  position: absolute;
+  z-index: 50;
+
+  .rct-dependency-path {
+    fill: none;
+    pointer-events: none;
+    stroke-width: 1;
+    stroke-dasharray: 0;
+
+    //&:hover {
+    //  stroke-width: 2;
+    //}
+  }
+
+  .rct-dependency-invisible-path {
+    fill: none;
+    pointer-events: visiblestroke;
+    stroke-width: 5;
+    stroke-dasharray: 0;
+    stroke: transparent;
+  }
 }

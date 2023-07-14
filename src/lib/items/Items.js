@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import Item from './Item'
+import Dependency from '../dependencies/Dependency'
 // import ItemGroup from './ItemGroup'
 
 import { _get, arraysEqual, keyBy } from '../utility/generic'
@@ -22,6 +23,7 @@ export default class Items extends Component {
   static propTypes = {
     groups: PropTypes.oneOfType([PropTypes.array, PropTypes.object]).isRequired,
     items: PropTypes.oneOfType([PropTypes.array, PropTypes.object]).isRequired,
+    dependencies: PropTypes.array,
 
     canvasTimeStart: PropTypes.number.isRequired,
     canvasTimeEnd: PropTypes.number.isRequired,
@@ -47,6 +49,7 @@ export default class Items extends Component {
 
     onItemDoubleClick: PropTypes.func,
     onItemContextMenu: PropTypes.func,
+    onDependencyClick: PropTypes.func,
 
     itemRenderer: PropTypes.func,
     selected: PropTypes.array,
@@ -77,7 +80,7 @@ export default class Items extends Component {
       nextProps.canChangeGroup === this.props.canChangeGroup &&
       nextProps.canMove === this.props.canMove &&
       nextProps.canResize === this.props.canResize &&
-      nextProps.canSelect === this.props.canSelect     
+      nextProps.canSelect === this.props.canSelect
     )
   }
 
@@ -102,7 +105,8 @@ export default class Items extends Component {
       canvasTimeEnd,
       dimensionItems,
       keys,
-      groups
+      groups,
+      dependencies
     } = this.props
     const { itemIdKey, itemGroupKey } = keys
 
@@ -164,6 +168,24 @@ export default class Items extends Component {
               scrollRef={this.props.scrollRef}
             />
           ))}
+
+        {dependencies &&
+          dependencies
+            .filter(
+              d =>
+                sortedDimensionItems[d.fromId] && sortedDimensionItems[d.toId]
+            )
+            .map(dependency => {
+              return (
+                <Dependency
+                  key={dependency.id}
+                  dependency={dependency}
+                  fromDimensionItem={sortedDimensionItems[dependency.fromId]}
+                  toDimensionItem={sortedDimensionItems[dependency.toId]}
+                  onClick={this.props.onDependencyClick}
+                />
+              )
+            })}
       </div>
     )
   }
