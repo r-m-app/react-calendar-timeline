@@ -440,14 +440,22 @@ export default class Item extends Component {
 
   componentDidMount() {
     if (this.props.canDrawDependency) {
+      const itemDroppableClassName = 'rct-item-droppable'
+
       interact(this.item).dropzone({
         ondragenter: event => {
-          event.target.classList.add('rct-item-droppable')
+          if (event.relatedTarget.dataset.id !== this.itemId) {
+            event.target.classList.add(itemDroppableClassName)
+          }
         },
         ondragleave: event => {
-          event.target.classList.remove('rct-item-droppable')
+          if (event.relatedTarget.dataset.id !== this.itemId) {
+            event.target.classList.remove(itemDroppableClassName)
+          }
         },
         ondrop: event => {
+          if (event.relatedTarget.dataset.id === this.itemId) return
+
           const middleOfItem =
             event.target.offsetLeft + event.target.offsetWidth / 2
           const leftOffsetOfDrop =
@@ -456,7 +464,7 @@ export default class Item extends Component {
             event.dragEvent.pageX
           const dropSide = leftOffsetOfDrop > middleOfItem ? 'end' : 'start'
 
-          event.target.classList.remove('rct-item-droppable')
+          event.target.classList.remove(itemDroppableClassName)
 
           if (this.props.onDependencyDrop) {
             this.props.onDependencyDrop(
