@@ -5,11 +5,21 @@ export const defaultItemRenderer = ({
   item,
   itemContext,
   getItemProps,
-  getResizeProps
+  getResizeProps,
+  getDrawProps
 }) => {
   const { left: leftResizeProps, right: rightResizeProps } = getResizeProps()
+  const { left: leftDrawProps, right: rightDrawProps } = getDrawProps()
   return (
     <div {...getItemProps(item.itemProps)}>
+      {itemContext.useDrawDependency && (
+        <div
+          className="rct-item-link-handle rct-item-link-handle-left"
+          style={{ display: itemContext.selected ? 'none' : undefined }}
+          {...leftDrawProps}
+        />
+      )}
+
       {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ''}
 
       <div
@@ -20,6 +30,14 @@ export const defaultItemRenderer = ({
       </div>
 
       {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : ''}
+
+      {itemContext.useDrawDependency && (
+        <div
+          className="rct-item-link-handle rct-item-link-handle-right"
+          style={{ display: itemContext.selected ? 'none' : undefined }}
+          {...rightDrawProps}
+        />
+      )}
     </div>
   )
 }
@@ -30,5 +48,6 @@ defaultItemRenderer.propTypes = {
   item: PropTypes.any,
   itemContext: PropTypes.any,
   getItemProps: PropTypes.any,
-  getResizeProps: PropTypes.any
+  getResizeProps: PropTypes.any,
+  getDrawProps: PropTypes.any
 }

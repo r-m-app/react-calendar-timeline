@@ -8,6 +8,7 @@ import { composeEvents } from '../utility/events'
 import { defaultItemRenderer } from './defaultItemRenderer'
 import { coordinateToTimeRatio } from '../utility/calendar'
 import { getSumScroll, getSumOffset } from '../utility/dom-helpers'
+import { initDragItemDependency } from '../dependencies/dependency-drawing'
 import {
   overridableStyles,
   selectedStyle,
@@ -19,6 +20,7 @@ import {
   leftResizeStyle,
   rightResizeStyle
 } from './styles'
+
 export default class Item extends Component {
   // removed prop type check for SPEED!
   // they are coming from a trusted component anyway
@@ -37,6 +39,8 @@ export default class Item extends Component {
     canMove: PropTypes.bool.isRequired,
     canResizeLeft: PropTypes.bool.isRequired,
     canResizeRight: PropTypes.bool.isRequired,
+
+    canDrawDependency: PropTypes.bool,
 
     keys: PropTypes.object.isRequired,
     item: PropTypes.object.isRequired,
@@ -57,7 +61,10 @@ export default class Item extends Component {
     moveResizeValidator: PropTypes.func,
     onItemDoubleClick: PropTypes.func,
 
-    scrollRef: PropTypes.object
+    scrollRef: PropTypes.object,
+
+    dependencyDrawingRef: PropTypes.object,
+    onDependencyDrop: PropTypes.func
   }
 
   static defaultProps = {
@@ -86,7 +93,9 @@ export default class Item extends Component {
       resizing: null,
       resizeEdge: null,
       resizeStart: null,
-      resizeTime: null
+      resizeTime: null,
+
+      drawingDependency: false
     }
   }
 
@@ -180,6 +189,9 @@ export default class Item extends Component {
       this.props.canvasTimeStart
     )
   }
+
+  getScrollRef = () => this.props.scrollRef
+  getDependencyDrawingRef = () => this.props.dependencyDrawingRef
 
   dragGroupDelta(e) {
     const { groupTops, order } = this.props
@@ -426,6 +438,52 @@ export default class Item extends Component {
     return !!props.canMove
   }
 
+  componentDidMount() {
+    if (this.props.canDrawDependency) {
+      interact(this.item).dropzone({
+        ondragenter: event => {
+          event.target.classList.add('rct-item-droppable')
+        },
+        ondragleave: event => {
+          event.target.classList.remove('rct-item-droppable')
+        },
+        ondrop: event => {
+          const middleOfItem =
+            event.target.offsetLeft + event.target.offsetWidth / 2
+          const leftOffsetOfDrop =
+            this.props.scrollRef.scrollLeft -
+            getSumOffset(this.props.scrollRef).offsetLeft +
+            event.dragEvent.pageX
+          const dropSide = leftOffsetOfDrop > middleOfItem ? 'end' : 'start'
+
+          event.target.classList.remove('rct-item-droppable')
+
+          if (this.props.onDependencyDrop) {
+            this.props.onDependencyDrop(
+              {
+                id: event.relatedTarget.dataset.id,
+                side: event.relatedTarget.dataset.side
+              },
+              { id: this.itemId, side: dropSide }
+            )
+          }
+        }
+      })
+
+      initDragItemDependency(
+        this.drawHandleRight,
+        this.getDependencyDrawingRef,
+        this.getScrollRef
+      )
+
+      initDragItemDependency(
+        this.drawHandleLeft,
+        this.getDependencyDrawingRef,
+        this.getScrollRef
+      )
+    }
+  }
+
   componentDidUpdate(prevProps) {
     this.cacheDataFromProps(this.props)
     let { interactMounted } = this.state
@@ -474,6 +532,13 @@ export default class Item extends Component {
   }
 
   onMouseDown = e => {
+    if (
+      this.props.canDrawDependency &&
+      (e.target === this.drawHandleRight || e.target === this.drawHandleLeft)
+    ) {
+      e.stopPropagation()
+    }
+
     if (!this.state.interactMounted) {
       e.preventDefault()
       this.startedClicking = true
@@ -525,6 +590,8 @@ export default class Item extends Component {
   getItemRef = el => (this.item = el)
   getDragLeftRef = el => (this.dragLeft = el)
   getDragRightRef = el => (this.dragRight = el)
+  getDrawHandleLeftRef = el => (this.drawHandleLeft = el)
+  getDrawHandleRightRef = el => (this.drawHandleRight = el)
 
   getItemProps = (props = {}) => {
     //TODO: maybe shouldnt include all of these classes
@@ -569,6 +636,21 @@ export default class Item extends Component {
         ref: this.getDragRightRef,
         className: rightName,
         style: Object.assign({}, rightResizeStyle, props.rightStyle)
+      }
+    }
+  }
+
+  getDrawProps = () => {
+    return {
+      left: {
+        ref: this.getDrawHandleLeftRef,
+        'data-id': this.itemId,
+        'data-side': 'start'
+      },
+      right: {
+        ref: this.getDrawHandleRightRef,
+        'data-id': this.itemId,
+        'data-side': 'end'
       }
     }
   }
@@ -620,6 +702,7 @@ export default class Item extends Component {
     const itemContext = {
       dimensions: this.props.dimensions,
       useResizeHandle: this.props.useResizeHandle,
+      useDrawDependency: this.props.canDrawDependency,
       title: this.itemTitle,
       canMove: this.canMove(this.props),
       canResizeLeft: this.canResizeLeft(this.props),
@@ -641,7 +724,8 @@ export default class Item extends Component {
       timelineContext,
       itemContext,
       getItemProps: this.getItemProps,
-      getResizeProps: this.getResizeProps
+      getResizeProps: this.getResizeProps,
+      getDrawProps: this.getDrawProps
     })
   }
 }

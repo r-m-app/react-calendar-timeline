@@ -162,14 +162,6 @@ export default class App extends Component {
         color: 'green'
       },
       {
-        id: '4',
-        fromId: '6',
-        fromSide: 'start',
-        toId: '2',
-        toSide: 'start',
-        color: 'red'
-      },
-      {
         id: '5',
         fromId: '4',
         fromSide: 'end',
@@ -292,6 +284,11 @@ export default class App extends Component {
     console.log('Dependency clicked', dependency, e)
   }
 
+  handleDependencyCreate = (from, to) => {
+    console.log('Dependency Dropped', from, to)
+    this.setState({ dependencies: [...this.state.dependencies, { id: Date.now().toString(), fromId: from.id, fromSide: from.side, toId: to.id, toSide: to.side, color: 'green' }]})
+  }
+
   render() {
     const { groups, items, dependencies, defaultTimeStart, defaultTimeEnd } = this.state
 
@@ -324,6 +321,8 @@ export default class App extends Component {
         onTimeChange={this.handleTimeChange}
         onZoom={this.handleZoom}
         onDependencyClick={this.handleDependencyClick}
+        canDrawDependency={true}
+        onDependencyDrop={this.handleDependencyCreate}
         buffer={3}
       >
         <TimelineMarkers>

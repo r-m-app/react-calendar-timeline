@@ -72,7 +72,9 @@ export default class ReactCalendarTimeline extends Component {
 
     moveResizeValidator: PropTypes.func,
 
+    canDrawDependency: PropTypes.bool,
     onDependencyClick: PropTypes.func,
+    onDependencyDrop: PropTypes.func,
 
     itemRenderer: PropTypes.func,
     groupRenderer: PropTypes.func,
@@ -803,7 +805,9 @@ export default class ReactCalendarTimeline extends Component {
         onItemContextMenu={
           this.props.onItemContextMenu ? this.contextMenuClickItem : undefined
         }
+        canDrawDependency={this.props.canDrawDependency}
         onDependencyClick={this.props.onDependencyClick}
+        onDependencyDrop={this.props.onDependencyDrop}
         itemResizing={this.resizingItem}
         itemResized={this.resizedItem}
         itemRenderer={this.props.itemRenderer}

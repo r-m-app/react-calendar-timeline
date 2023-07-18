@@ -37,6 +37,7 @@ export default class Items extends Component {
     canMove: PropTypes.bool.isRequired,
     canResize: PropTypes.oneOf([true, false, 'left', 'right', 'both']),
     canSelect: PropTypes.bool,
+    canDrawDependency: PropTypes.bool,
 
     keys: PropTypes.object.isRequired,
 
@@ -50,6 +51,7 @@ export default class Items extends Component {
     onItemDoubleClick: PropTypes.func,
     onItemContextMenu: PropTypes.func,
     onDependencyClick: PropTypes.func,
+    onDependencyDrop: PropTypes.func,
 
     itemRenderer: PropTypes.func,
     selected: PropTypes.array,
@@ -69,6 +71,9 @@ export default class Items extends Component {
       arraysEqual(nextProps.groups, this.props.groups) &&
       arraysEqual(nextProps.items, this.props.items) &&
       arraysEqual(nextProps.dimensionItems, this.props.dimensionItems) &&
+      (nextProps.dependencies &&
+        this.props.dependencies &&
+        arraysEqual(nextProps.dependencies, this.props.dependencies)) &&
       nextProps.keys === this.props.keys &&
       nextProps.canvasTimeStart === this.props.canvasTimeStart &&
       nextProps.canvasTimeEnd === this.props.canvasTimeEnd &&
@@ -98,6 +103,8 @@ export default class Items extends Component {
 
     return getVisibleItems(items, canvasTimeStart, canvasTimeEnd, keys)
   }
+
+  getDependencyDrawingRef = el => (this.dependencyDrawingRef = el)
 
   render() {
     const {
@@ -149,6 +156,7 @@ export default class Items extends Component {
                   ? _get(item, 'canSelect')
                   : this.props.canSelect
               }
+              canDrawDependency={this.props.canDrawDependency}
               useResizeHandle={this.props.useResizeHandle}
               groupTops={this.props.groupTops}
               canvasTimeStart={this.props.canvasTimeStart}
@@ -166,6 +174,8 @@ export default class Items extends Component {
               onSelect={this.props.itemSelect}
               itemRenderer={this.props.itemRenderer}
               scrollRef={this.props.scrollRef}
+              dependencyDrawingRef={this.dependencyDrawingRef}
+              onDependencyDrop={this.props.onDependencyDrop}
             />
           ))}
 
@@ -186,6 +196,32 @@ export default class Items extends Component {
                 />
               )
             })}
+
+        <svg
+          className="rct-dependency-drawing"
+          ref={this.getDependencyDrawingRef}
+        >
+          <defs>
+            <marker
+              id="dependency-marker-0"
+              viewBox="0 0 10 10"
+              refX="9"
+              refY="5"
+              markerWidth="12"
+              markerHeight="10"
+              orient="auto-start-reverse"
+              markerUnits="userSpaceOnUse"
+            >
+              <path d="M 0 1 L 12 5 L 0 9 z" fill="green" />
+            </marker>
+          </defs>
+          <path
+            d="M 0 0 L 0 0"
+            // style={getPathStyles(color, this.state.isSelected)}
+            markerEnd={`url(#dependency-marker-0)`}
+            id="rct-dependency-drawing-path"
+          />
+        </svg>
       </div>
     )
   }
