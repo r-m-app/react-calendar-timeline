@@ -157,11 +157,29 @@
 .rct-dependency-drawing {
   position: absolute;
   z-index: 999;
-  display: none; }
+  display: none;
+  pointer-events: none; }
   .rct-dependency-drawing > path {
     stroke: green;
     stroke-width: 2;
     stroke-dasharray: 3; }
 
-.rct-item-droppable {
-  outline: 2px dashed rgba(255, 47, 0, 0.5); }
+.rct-item-dependency-dropzone {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  visibility: hidden; }
+  .rct-item-dependency-dropzone:first-child {
+    left: 0; }
+  .rct-item-dependency-dropzone:last-child {
+    right: 0; }
+  .rct-item-dependency-dropzone.rct-item-droppable {
+    visibility: visible;
+    background: rgba(0, 0, 0, 0.2); }
+
+.rct-drawing-dependency-active .rct-item-link-handle {
+  display: block;
+  visibility: hidden; }
+  .rct-drawing-dependency-active .rct-item-link-handle.rct-item-link-handle-active {
+    visibility: visible; }
