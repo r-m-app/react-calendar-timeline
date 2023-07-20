@@ -74,7 +74,7 @@ export default class ReactCalendarTimeline extends Component {
 
     canDrawDependency: PropTypes.bool,
     onDependencyClick: PropTypes.func,
-    onDependencyDrop: PropTypes.func,
+    onDependencyDraw: PropTypes.func,
 
     itemRenderer: PropTypes.func,
     groupRenderer: PropTypes.func,
@@ -280,7 +280,8 @@ export default class ReactCalendarTimeline extends Component {
       dragGroupTitle: null,
       resizeTime: null,
       resizingItem: null,
-      resizingEdge: null
+      resizingEdge: null,
+      drawingDependency: null
     }
 
     const canvasWidth = getCanvasWidth(this.state.width, props.buffer)
@@ -750,6 +751,14 @@ export default class ReactCalendarTimeline extends Component {
     }
   }
 
+  handleDrawingStart = () => {
+    this.setState({ drawingDependency: true })
+  }
+
+  handleDrawingFinish = () => {
+    this.setState({ drawingDependency: null })
+  }
+
   rows(canvasWidth, groupHeights, groups) {
     return (
       <GroupRows
@@ -807,7 +816,9 @@ export default class ReactCalendarTimeline extends Component {
         }
         canDrawDependency={this.props.canDrawDependency}
         onDependencyClick={this.props.onDependencyClick}
-        onDependencyDrop={this.props.onDependencyDrop}
+        onDrawingStart={this.handleDrawingStart}
+        onDrawingFinish={this.handleDrawingFinish}
+        onDependencyDraw={this.props.onDependencyDraw}
         itemResizing={this.resizingItem}
         itemResized={this.resizedItem}
         itemRenderer={this.props.itemRenderer}
@@ -953,6 +964,17 @@ export default class ReactCalendarTimeline extends Component {
     this.scrollComponent = el
   }
 
+  getContainerClassName = () => {
+    const drawingClassName = this.state.drawingDependency
+      ? ` rct-drawing-dependency-active`
+      : ''
+    const externalClassName = this.props.className
+      ? ` ${this.props.className}`
+      : ''
+
+    return `react-calendar-timeline${externalClassName}${drawingClassName}`
+  }
+
   render() {
     const {
       items,
@@ -1029,7 +1051,7 @@ export default class ReactCalendarTimeline extends Component {
             <div
               style={this.props.style}
               ref={el => (this.container = el)}
-              className={`react-calendar-timeline ${this.props.className}`}
+              className={this.getContainerClassName()}
             >
               {this.renderHeaders()}
               <div style={outerComponentStyle} className="rct-outer">
