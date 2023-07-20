@@ -9,6 +9,7 @@ import { defaultItemRenderer } from './defaultItemRenderer'
 import { coordinateToTimeRatio } from '../utility/calendar'
 import { getSumScroll, getSumOffset } from '../utility/dom-helpers'
 import { initDragItemDependency } from '../dependencies/dependency-drawing'
+import { DEPENDENCY_DIRECTIONS } from '../dependencies/constants.js'
 import {
   overridableStyles,
   selectedStyle,
@@ -64,7 +65,9 @@ export default class Item extends Component {
     scrollRef: PropTypes.object,
 
     dependencyDrawingRef: PropTypes.object,
-    onDependencyDrop: PropTypes.func
+    onDrawingStart: PropTypes.func,
+    onDrawingFinish: PropTypes.func,
+    onDependencyDraw: PropTypes.func
   }
 
   static defaultProps = {
@@ -93,9 +96,7 @@ export default class Item extends Component {
       resizing: null,
       resizeEdge: null,
       resizeStart: null,
-      resizeTime: null,
-
-      drawingDependency: false
+      resizeTime: null
     }
   }
 
@@ -442,7 +443,7 @@ export default class Item extends Component {
     if (this.props.canDrawDependency) {
       const itemDroppableClassName = 'rct-item-droppable'
 
-      interact(this.item).dropzone({
+      const dropzoneOptions = {
         ondragenter: event => {
           if (event.relatedTarget.dataset.id !== this.itemId) {
             event.target.classList.add(itemDroppableClassName)
@@ -456,39 +457,41 @@ export default class Item extends Component {
         ondrop: event => {
           if (event.relatedTarget.dataset.id === this.itemId) return
 
-          const middleOfItem =
-            event.target.offsetLeft + event.target.offsetWidth / 2
-          const leftOffsetOfDrop =
-            this.props.scrollRef.scrollLeft -
-            getSumOffset(this.props.scrollRef).offsetLeft +
-            event.dragEvent.pageX
-          const dropSide = leftOffsetOfDrop > middleOfItem ? 'end' : 'start'
-
           event.target.classList.remove(itemDroppableClassName)
 
-          if (this.props.onDependencyDrop) {
-            this.props.onDependencyDrop(
+          if (this.props.onDependencyDraw) {
+            this.props.onDependencyDraw(
               {
                 id: event.relatedTarget.dataset.id,
                 side: event.relatedTarget.dataset.side
               },
-              { id: this.itemId, side: dropSide }
+              { id: this.itemId, side: event.target.dataset.side }
             )
           }
         }
-      })
+      }
 
-      initDragItemDependency(
-        this.drawHandleRight,
-        this.getDependencyDrawingRef,
-        this.getScrollRef
-      )
+      this.dropZoneLeft && interact(this.dropZoneLeft).dropzone(dropzoneOptions)
+      this.dropZoneRight &&
+        interact(this.dropZoneRight).dropzone(dropzoneOptions)
 
-      initDragItemDependency(
-        this.drawHandleLeft,
-        this.getDependencyDrawingRef,
-        this.getScrollRef
-      )
+      this.drawHandleRight &&
+        initDragItemDependency(
+          this.drawHandleRight,
+          this.getDependencyDrawingRef,
+          this.getScrollRef,
+          this.props.onDrawingStart,
+          this.props.onDrawingFinish
+        )
+
+      this.drawHandleLeft &&
+        initDragItemDependency(
+          this.drawHandleLeft,
+          this.getDependencyDrawingRef,
+          this.getScrollRef,
+          this.props.onDrawingStart,
+          this.props.onDrawingFinish
+        )
     }
   }
 
@@ -600,6 +603,8 @@ export default class Item extends Component {
   getDragRightRef = el => (this.dragRight = el)
   getDrawHandleLeftRef = el => (this.drawHandleLeft = el)
   getDrawHandleRightRef = el => (this.drawHandleRight = el)
+  getDropZoneLeftRef = el => (this.dropZoneLeft = el)
+  getDropZoneRightRef = el => (this.dropZoneRight = el)
 
   getItemProps = (props = {}) => {
     //TODO: maybe shouldnt include all of these classes
@@ -653,12 +658,25 @@ export default class Item extends Component {
       left: {
         ref: this.getDrawHandleLeftRef,
         'data-id': this.itemId,
-        'data-side': 'start'
+        'data-side': DEPENDENCY_DIRECTIONS.START
       },
       right: {
         ref: this.getDrawHandleRightRef,
         'data-id': this.itemId,
-        'data-side': 'end'
+        'data-side': DEPENDENCY_DIRECTIONS.FINISH
+      }
+    }
+  }
+
+  getDropProps = () => {
+    return {
+      left: {
+        ref: this.getDropZoneLeftRef,
+        'data-side': DEPENDENCY_DIRECTIONS.START
+      },
+      right: {
+        ref: this.getDropZoneRightRef,
+        'data-side': DEPENDENCY_DIRECTIONS.FINISH
       }
     }
   }
@@ -733,7 +751,8 @@ export default class Item extends Component {
       itemContext,
       getItemProps: this.getItemProps,
       getResizeProps: this.getResizeProps,
-      getDrawProps: this.getDrawProps
+      getDrawProps: this.getDrawProps,
+      getDropProps: this.getDropProps
     })
   }
 }

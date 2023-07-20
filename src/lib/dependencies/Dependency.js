@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { DEPENDENCY_DIRECTIONS } from './constants.js'
 
 class Dependency extends React.PureComponent {
   static propTypes = {
@@ -97,12 +98,12 @@ function getPathStyles(color, isSelected) {
 
 function calculatePathCoords(fromItem, toItem, fromSide, toSide) {
   const X1 =
-    fromSide === 'start'
+    fromSide === DEPENDENCY_DIRECTIONS.START
       ? fromItem.dimensions.left
       : fromItem.dimensions.left + fromItem.dimensions.width
   const Y1 = fromItem.dimensions.top + fromItem.dimensions.height / 2
   const X2 =
-    toSide === 'start'
+    toSide === DEPENDENCY_DIRECTIONS.START
       ? toItem.dimensions.left
       : toItem.dimensions.left + toItem.dimensions.width
   const Y2 = toItem.dimensions.top + toItem.dimensions.height / 2
@@ -137,8 +138,13 @@ function drawDependencyPath(
   const cDX = 40
 
   const reverseStart =
-    isSameSide && fromSide === 'start' ? true : fromSide === 'start'
-  const reverseEnd = isSameSide && toSide === 'end' ? true : toSide === 'end'
+    isSameSide && fromSide === DEPENDENCY_DIRECTIONS.START
+      ? true
+      : fromSide === DEPENDENCY_DIRECTIONS.START
+  const reverseEnd =
+    isSameSide && toSide === DEPENDENCY_DIRECTIONS.FINISH
+      ? true
+      : toSide === DEPENDENCY_DIRECTIONS.FINISH
 
   const arrowDX = reverseEnd ? 2 : -2
   const X = X1 <= X2 ? [dX, width - dX + arrowDX] : [width - dX, dX + arrowDX]

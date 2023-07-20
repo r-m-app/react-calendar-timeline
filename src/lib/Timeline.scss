@@ -229,6 +229,7 @@ $weekend: rgba(250, 246, 225, 0.5);
   position: absolute;
   z-index: 999;
   display: none;
+  pointer-events: none;
 
   > path {
     stroke: green;
@@ -237,6 +238,34 @@ $weekend: rgba(250, 246, 225, 0.5);
   }
 }
 
-.rct-item-droppable {
-  outline: 2px dashed rgba(255, 47, 0, 0.5);
+.rct-item-dependency-dropzone {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  visibility: hidden;
+
+  &:first-child {
+    left: 0;
+  }
+
+  &:last-child {
+    right: 0;
+  }
+
+  &.rct-item-droppable {
+    visibility: visible;
+    background: rgba(0,0,0,0.2);
+  }
+}
+
+.rct-drawing-dependency-active {
+  .rct-item-link-handle {
+    display: block;
+    visibility: hidden;
+
+    &.rct-item-link-handle-active {
+      visibility: visible;
+    }
+  }
 }

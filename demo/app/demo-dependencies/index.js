@@ -9,8 +9,6 @@ import Timeline, {
   CursorMarker,
 } from 'react-calendar-timeline'
 
-import generateFakeData from '../generate-fake-data'
-
 var minTime = moment()
   .add(-6, 'months')
   .valueOf()
@@ -140,7 +138,7 @@ export default class App extends Component {
       {
         id: '1',
         fromId: '1',
-        fromSide: 'end',
+        fromSide: 'finish',
         toId: '2',
         toSide: 'start',
         color: 'red'
@@ -148,7 +146,7 @@ export default class App extends Component {
       {
         id: '2',
         fromId: '2',
-        fromSide: 'end',
+        fromSide: 'finish',
         toId: '3',
         toSide: 'start',
         color: 'blue'
@@ -156,7 +154,7 @@ export default class App extends Component {
       {
         id: '3',
         fromId: '3',
-        fromSide: 'end',
+        fromSide: 'finish',
         toId: '4',
         toSide: 'start',
         color: 'green'
@@ -164,7 +162,7 @@ export default class App extends Component {
       {
         id: '5',
         fromId: '4',
-        fromSide: 'end',
+        fromSide: 'finish',
         toId: '1',
         toSide: 'start',
         color: 'violet'
@@ -172,9 +170,9 @@ export default class App extends Component {
       {
         id: '6',
         fromId: '5',
-        fromSide: 'end',
+        fromSide: 'finish',
         toId: '7',
-        toSide: 'end',
+        toSide: 'finish',
         color: 'green'
       }
     ]
@@ -322,7 +320,7 @@ export default class App extends Component {
         onZoom={this.handleZoom}
         onDependencyClick={this.handleDependencyClick}
         canDrawDependency={true}
-        onDependencyDrop={this.handleDependencyCreate}
+        onDependencyDraw={this.handleDependencyCreate}
         buffer={3}
       >
         <TimelineMarkers>

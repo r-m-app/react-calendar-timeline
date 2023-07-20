@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import Item from './Item'
 import Dependency from '../dependencies/Dependency'
+import DrawingPath from '../dependencies/DrawingPath'
 // import ItemGroup from './ItemGroup'
 
 import { _get, arraysEqual, keyBy } from '../utility/generic'
@@ -51,7 +52,9 @@ export default class Items extends Component {
     onItemDoubleClick: PropTypes.func,
     onItemContextMenu: PropTypes.func,
     onDependencyClick: PropTypes.func,
-    onDependencyDrop: PropTypes.func,
+    onDrawingStart: PropTypes.func,
+    onDrawingFinish: PropTypes.func,
+    onDependencyDraw: PropTypes.func,
 
     itemRenderer: PropTypes.func,
     selected: PropTypes.array,
@@ -175,7 +178,9 @@ export default class Items extends Component {
               itemRenderer={this.props.itemRenderer}
               scrollRef={this.props.scrollRef}
               dependencyDrawingRef={this.dependencyDrawingRef}
-              onDependencyDrop={this.props.onDependencyDrop}
+              onDrawingStart={this.props.onDrawingStart}
+              onDrawingFinish={this.props.onDrawingFinish}
+              onDependencyDraw={this.props.onDependencyDraw}
             />
           ))}
 
@@ -197,31 +202,7 @@ export default class Items extends Component {
               )
             })}
 
-        <svg
-          className="rct-dependency-drawing"
-          ref={this.getDependencyDrawingRef}
-        >
-          <defs>
-            <marker
-              id="dependency-marker-0"
-              viewBox="0 0 10 10"
-              refX="9"
-              refY="5"
-              markerWidth="12"
-              markerHeight="10"
-              orient="auto-start-reverse"
-              markerUnits="userSpaceOnUse"
-            >
-              <path d="M 0 1 L 12 5 L 0 9 z" fill="green" />
-            </marker>
-          </defs>
-          <path
-            d="M 0 0 L 0 0"
-            // style={getPathStyles(color, this.state.isSelected)}
-            markerEnd={`url(#dependency-marker-0)`}
-            id="rct-dependency-drawing-path"
-          />
-        </svg>
+        <DrawingPath innerRef={this.getDependencyDrawingRef} />
       </div>
     )
   }

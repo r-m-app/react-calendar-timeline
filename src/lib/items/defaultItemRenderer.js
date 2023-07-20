@@ -6,20 +6,14 @@ export const defaultItemRenderer = ({
   itemContext,
   getItemProps,
   getResizeProps,
-  getDrawProps
+  getDrawProps,
+  getDropProps
 }) => {
   const { left: leftResizeProps, right: rightResizeProps } = getResizeProps()
+  const { left: leftDropProps, right: rightDropProps } = getDropProps()
   const { left: leftDrawProps, right: rightDrawProps } = getDrawProps()
   return (
     <div {...getItemProps(item.itemProps)}>
-      {itemContext.useDrawDependency && (
-        <div
-          className="rct-item-link-handle rct-item-link-handle-left"
-          style={{ display: itemContext.selected ? 'none' : undefined }}
-          {...leftDrawProps}
-        />
-      )}
-
       {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ''}
 
       <div
@@ -33,10 +27,21 @@ export const defaultItemRenderer = ({
 
       {itemContext.useDrawDependency && (
         <div
-          className="rct-item-link-handle rct-item-link-handle-right"
+          className="rct-item-link-handle-container"
           style={{ display: itemContext.selected ? 'none' : undefined }}
-          {...rightDrawProps}
-        />
+        >
+          <div
+            className="rct-item-link-handle rct-item-link-handle-left"
+            {...leftDrawProps}
+          />
+          <div
+            className="rct-item-link-handle rct-item-link-handle-right"
+            {...rightDrawProps}
+          />
+
+          <div className="rct-item-dependency-dropzone" {...leftDropProps} />
+          <div className="rct-item-dependency-dropzone" {...rightDropProps} />
+        </div>
       )}
     </div>
   )
@@ -49,5 +54,6 @@ defaultItemRenderer.propTypes = {
   itemContext: PropTypes.any,
   getItemProps: PropTypes.any,
   getResizeProps: PropTypes.any,
-  getDrawProps: PropTypes.any
+  getDrawProps: PropTypes.any,
+  getDropProps: PropTypes.any
 }

@@ -1,4 +1,5 @@
 import interact from 'interactjs'
+import { getSumOffset, getSumScroll } from '../utility/dom-helpers'
 
 const PATH_ID = 'rct-dependency-drawing-path'
 const ACTIVE_HANDLE_CLASS = 'rct-item-link-handle-active'
@@ -6,7 +7,9 @@ const ACTIVE_HANDLE_CLASS = 'rct-item-link-handle-active'
 export const initDragItemDependency = (
   drawHandle,
   getDrawingSvgElement,
-  getScrollRef
+  getScrollRef,
+  onDragStart,
+  onDragEnd
 ) => {
   let _drawingPath
 
@@ -23,24 +26,29 @@ export const initDragItemDependency = (
       drawingSvgElement.style.display = 'block'
       drawingSvgElement.style.width = 0
       drawingSvgElement.style.height = 0
+
+      onDragStart && onDragStart()
     })
     .on('dragmove', e => {
       const targetRect = e.target.getBoundingClientRect()
       const scrollRef = getScrollRef()
 
+      const offset = getSumOffset(scrollRef)
+      const scrolls = getSumScroll(scrollRef)
+
       const X1 =
         targetRect.left +
-        targetRect.width / 4 +
-        scrollRef.scrollLeft -
-        scrollRef.offsetLeft
+        targetRect.width / 4 -
+        offset.offsetLeft +
+        scrolls.scrollLeft
       const Y1 =
         targetRect.top +
-        targetRect.height / 4 +
-        scrollRef.scrollTop -
-        scrollRef.offsetTop +
+        targetRect.height / 4 -
+        offset.offsetTop +
+        scrolls.scrollTop +
         window.scrollY
-      const X2 = e.pageX + scrollRef.scrollLeft - scrollRef.offsetLeft - 8
-      const Y2 = e.pageY + scrollRef.scrollTop - scrollRef.offsetTop
+      const X2 = e.pageX - offset.offsetLeft + scrolls.scrollLeft - 8
+      const Y2 = e.pageY - offset.offsetTop + scrolls.scrollTop
 
       const width = Math.abs(X2 - X1)
       const height = Math.abs(Y2 - Y1)
@@ -60,12 +68,12 @@ export const initDragItemDependency = (
       )
     })
     .on('dragend', e => {
-      // this.setState({ drawingDependency: false })
-
       e.target.classList.remove(ACTIVE_HANDLE_CLASS)
 
       _drawingPath = undefined
 
       getDrawingSvgElement().style = {}
+
+      onDragEnd && onDragEnd()
     })
 }
