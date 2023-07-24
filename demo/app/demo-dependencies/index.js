@@ -321,6 +321,7 @@ export default class App extends Component {
         onDependencyClick={this.handleDependencyClick}
         canDrawDependency={true}
         onDependencyDraw={this.handleDependencyCreate}
+        drawingPathColor="red"
         buffer={3}
       >
         <TimelineMarkers>

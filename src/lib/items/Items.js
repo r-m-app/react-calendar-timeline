@@ -55,6 +55,7 @@ export default class Items extends Component {
     onDrawingStart: PropTypes.func,
     onDrawingFinish: PropTypes.func,
     onDependencyDraw: PropTypes.func,
+    drawingPathColor: PropTypes.string,
 
     itemRenderer: PropTypes.func,
     selected: PropTypes.array,
@@ -202,7 +203,7 @@ export default class Items extends Component {
               )
             })}
 
-        <DrawingPath innerRef={this.getDependencyDrawingRef} />
+        <DrawingPath innerRef={this.getDependencyDrawingRef} color={this.props.drawingPathColor} />
       </div>
     )
   }
