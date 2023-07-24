@@ -86,6 +86,7 @@ export default class Item extends Component {
 
     this.state = {
       interactMounted: false,
+      drawDependencyMounted: false,
 
       dragging: null,
       dragStart: null,
@@ -419,6 +420,61 @@ export default class Item extends Component {
     })
   }
 
+  mountDrawDependency() {
+    const itemDroppableClassName = 'rct-item-droppable'
+
+    const dropzoneOptions = {
+      ondragenter: event => {
+        if (event.relatedTarget.dataset.id !== this.itemId) {
+          event.target.classList.add(itemDroppableClassName)
+        }
+      },
+      ondragleave: event => {
+        if (event.relatedTarget.dataset.id !== this.itemId) {
+          event.target.classList.remove(itemDroppableClassName)
+        }
+      },
+      ondrop: event => {
+        if (event.relatedTarget.dataset.id === this.itemId) return
+
+        event.target.classList.remove(itemDroppableClassName)
+
+        if (this.props.onDependencyDraw) {
+          this.props.onDependencyDraw(
+            {
+              id: event.relatedTarget.dataset.id,
+              side: event.relatedTarget.dataset.side
+            },
+            { id: this.itemId, side: event.target.dataset.side }
+          )
+        }
+      }
+    }
+
+    this.dropZoneLeft && interact(this.dropZoneLeft).dropzone(dropzoneOptions)
+    this.dropZoneRight && interact(this.dropZoneRight).dropzone(dropzoneOptions)
+
+    this.drawHandleRight &&
+      initDragItemDependency(
+        this.drawHandleRight,
+        this.getDependencyDrawingRef,
+        this.getScrollRef,
+        this.props.onDrawingStart,
+        this.props.onDrawingFinish
+      )
+
+    this.drawHandleLeft &&
+      initDragItemDependency(
+        this.drawHandleLeft,
+        this.getDependencyDrawingRef,
+        this.getScrollRef,
+        this.props.onDrawingStart,
+        this.props.onDrawingFinish
+      )
+
+    this.setState({ drawDependencyMounted: true })
+  }
+
   canResizeLeft(props = this.props) {
     if (!props.canResizeLeft) {
       return false
@@ -439,65 +495,9 @@ export default class Item extends Component {
     return !!props.canMove
   }
 
-  componentDidMount() {
-    if (this.props.canDrawDependency) {
-      const itemDroppableClassName = 'rct-item-droppable'
-
-      const dropzoneOptions = {
-        ondragenter: event => {
-          if (event.relatedTarget.dataset.id !== this.itemId) {
-            event.target.classList.add(itemDroppableClassName)
-          }
-        },
-        ondragleave: event => {
-          if (event.relatedTarget.dataset.id !== this.itemId) {
-            event.target.classList.remove(itemDroppableClassName)
-          }
-        },
-        ondrop: event => {
-          if (event.relatedTarget.dataset.id === this.itemId) return
-
-          event.target.classList.remove(itemDroppableClassName)
-
-          if (this.props.onDependencyDraw) {
-            this.props.onDependencyDraw(
-              {
-                id: event.relatedTarget.dataset.id,
-                side: event.relatedTarget.dataset.side
-              },
-              { id: this.itemId, side: event.target.dataset.side }
-            )
-          }
-        }
-      }
-
-      this.dropZoneLeft && interact(this.dropZoneLeft).dropzone(dropzoneOptions)
-      this.dropZoneRight &&
-        interact(this.dropZoneRight).dropzone(dropzoneOptions)
-
-      this.drawHandleRight &&
-        initDragItemDependency(
-          this.drawHandleRight,
-          this.getDependencyDrawingRef,
-          this.getScrollRef,
-          this.props.onDrawingStart,
-          this.props.onDrawingFinish
-        )
-
-      this.drawHandleLeft &&
-        initDragItemDependency(
-          this.drawHandleLeft,
-          this.getDependencyDrawingRef,
-          this.getScrollRef,
-          this.props.onDrawingStart,
-          this.props.onDrawingFinish
-        )
-    }
-  }
-
   componentDidUpdate(prevProps) {
     this.cacheDataFromProps(this.props)
-    let { interactMounted } = this.state
+    let { interactMounted, drawDependencyMounted } = this.state
     const couldDrag = prevProps.selected && this.canMove(prevProps)
     const couldResizeLeft = prevProps.selected && this.canResizeLeft(prevProps)
     const couldResizeRight =
@@ -509,6 +509,15 @@ export default class Item extends Component {
       this.props.selected && this.canResizeRight(this.props)
 
     if (this.item) {
+      if (
+        this.props.canDrawDependency &&
+        this.props.order &&
+        !drawDependencyMounted
+      ) {
+        this.mountDrawDependency()
+        drawDependencyMounted = true
+      }
+
       if (this.props.selected && !interactMounted) {
         this.mountInteract()
         interactMounted = true
@@ -536,9 +545,11 @@ export default class Item extends Component {
       }
     } else {
       interactMounted = false
+      drawDependencyMounted = false
     }
     this.setState({
-      interactMounted
+      interactMounted,
+      drawDependencyMounted
     })
   }
 
