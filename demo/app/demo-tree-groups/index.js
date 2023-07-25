@@ -56,7 +56,8 @@ export default class App extends Component {
       items: newItems,
       defaultTimeStart,
       defaultTimeEnd,
-      openGroups: {}
+      openGroups: {},
+      dependencies: []
     }
   }
 
@@ -76,7 +77,8 @@ export default class App extends Component {
       items,
       defaultTimeStart,
       defaultTimeEnd,
-      openGroups
+      openGroups,
+      dependencies
     } = this.state
 
     // hide (filter) the groups that are closed, for the rest, patch their "title" and add some callbacks or padding
@@ -116,6 +118,12 @@ export default class App extends Component {
         defaultTimeStart={defaultTimeStart}
         defaultTimeEnd={defaultTimeEnd}
         horizontalLineClassNamesForGroup={(group) => group.root ? ["row-root"] : []}
+        canDrawDependency={true}
+        onDependencyDraw={(from, to) => {
+          this.setState({ dependencies: [...this.state.dependencies, { id: Date.now().toString(), fromId: from.id, fromSide: from.side, toId: to.id, toSide: to.side, color: 'green' }]})
+        }
+        }
+        dependencies={dependencies}
       />
     )
   }

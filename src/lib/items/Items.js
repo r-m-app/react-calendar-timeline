@@ -128,6 +128,10 @@ export default class Items extends Component {
       groupOrders
     )
     const sortedDimensionItems = keyBy(dimensionItems, 'id')
+    const groupedDependencies = groupDependenciesByVisibleItems(
+      dependencies,
+      sortedDimensionItems
+    )
 
     return (
       <div className="rct-items">
@@ -182,6 +186,7 @@ export default class Items extends Component {
               onDrawingStart={this.props.onDrawingStart}
               onDrawingFinish={this.props.onDrawingFinish}
               onDependencyDraw={this.props.onDependencyDraw}
+              hiddenDependencies={groupedDependencies[_get(item, itemIdKey)]}
             />
           ))}
 
@@ -189,7 +194,8 @@ export default class Items extends Component {
           dependencies
             .filter(
               d =>
-                sortedDimensionItems[d.fromId] && sortedDimensionItems[d.toId]
+                isVisibleDimensionItem(sortedDimensionItems, d.fromId) &&
+                isVisibleDimensionItem(sortedDimensionItems, d.toId)
             )
             .map(dependency => {
               return (
@@ -203,8 +209,41 @@ export default class Items extends Component {
               )
             })}
 
-        <DrawingPath innerRef={this.getDependencyDrawingRef} color={this.props.drawingPathColor} />
+        <DrawingPath
+          innerRef={this.getDependencyDrawingRef}
+          color={this.props.drawingPathColor}
+        />
       </div>
     )
   }
+}
+
+function isVisibleDimensionItem(dimensionItems, itemId) {
+  if (!dimensionItems[itemId]) return false
+
+  const { order } = dimensionItems[itemId].dimensions
+
+  return order !== undefined && order !== null
+}
+
+function groupDependenciesByVisibleItems(dependencies, dimensionItems) {
+  return dependencies.reduce((acc, d) => {
+    if (
+      isVisibleDimensionItem(dimensionItems, d.fromId) &&
+      isVisibleDimensionItem(dimensionItems, d.toId)
+    )
+      return acc
+
+    if (!acc[d.fromId]) {
+      acc[d.fromId] = []
+    }
+
+    if (!acc[d.toId]) {
+      acc[d.toId] = []
+    }
+    acc[d.fromId].push(d)
+    acc[d.toId].push(d)
+
+    return acc
+  }, {})
 }

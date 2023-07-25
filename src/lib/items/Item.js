@@ -67,7 +67,8 @@ export default class Item extends Component {
     dependencyDrawingRef: PropTypes.object,
     onDrawingStart: PropTypes.func,
     onDrawingFinish: PropTypes.func,
-    onDependencyDraw: PropTypes.func
+    onDependencyDraw: PropTypes.func,
+    hiddenDependencies: PropTypes.array
   }
 
   static defaultProps = {
@@ -124,7 +125,8 @@ export default class Item extends Component {
       nextProps.canMove !== this.props.canMove ||
       nextProps.canResizeLeft !== this.props.canResizeLeft ||
       nextProps.canResizeRight !== this.props.canResizeRight ||
-      nextProps.dimensions !== this.props.dimensions
+      nextProps.dimensions !== this.props.dimensions ||
+      nextProps.hiddenDependencies !== this.props.hiddenDependencies
     return shouldUpdate
   }
 
@@ -763,7 +765,8 @@ export default class Item extends Component {
       getItemProps: this.getItemProps,
       getResizeProps: this.getResizeProps,
       getDrawProps: this.getDrawProps,
-      getDropProps: this.getDropProps
+      getDropProps: this.getDropProps,
+      hiddenDependencies: this.props.hiddenDependencies
     })
   }
 }

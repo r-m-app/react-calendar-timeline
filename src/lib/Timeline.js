@@ -973,8 +973,11 @@ export default class ReactCalendarTimeline extends Component {
     const externalClassName = this.props.className
       ? ` ${this.props.className}`
       : ''
+    const hasSelectedItemClassName = this.state.selectedItem
+      ? ` rct-has-selected-item`
+      : ''
 
-    return `react-calendar-timeline${externalClassName}${drawingClassName}`
+    return `react-calendar-timeline${externalClassName}${drawingClassName}${hasSelectedItemClassName}`
   }
 
   render() {
