@@ -7,8 +7,10 @@ export const defaultItemRenderer = ({
   getItemProps,
   getResizeProps,
   getDrawProps,
-  getDropProps
+  getDropProps,
+  hiddenDependencies
 }) => {
+  console.log('hiddenDependencies', hiddenDependencies, item.id)
   const { left: leftResizeProps, right: rightResizeProps } = getResizeProps()
   const { left: leftDropProps, right: rightDropProps } = getDropProps()
   const { left: leftDrawProps, right: rightDrawProps } = getDrawProps()
@@ -41,6 +43,19 @@ export const defaultItemRenderer = ({
 
           <div className="rct-item-dependency-dropzone" {...leftDropProps} />
           <div className="rct-item-dependency-dropzone" {...rightDropProps} />
+
+          {hiddenDependencies &&
+            hiddenDependencies.map(d => (
+              <span
+                key={d.id}
+                className={
+                  d.fromId === item.id
+                    ? `rct-hidden-dependency-${d.fromSide}`
+                    : `rct-hidden-dependency-${d.toSide}`
+                }
+                style={{ background: d.color }}
+              />
+            ))}
         </div>
       )}
     </div>
@@ -55,5 +70,6 @@ defaultItemRenderer.propTypes = {
   getItemProps: PropTypes.any,
   getResizeProps: PropTypes.any,
   getDrawProps: PropTypes.any,
-  getDropProps: PropTypes.any
+  getDropProps: PropTypes.any,
+  hiddenDependencies: PropTypes.array
 }
