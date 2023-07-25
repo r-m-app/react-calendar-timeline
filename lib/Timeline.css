@@ -182,3 +182,19 @@
   visibility: hidden; }
   .rct-drawing-dependency-active .rct-item-link-handle.rct-item-link-handle-active {
     visibility: visible; }
+
+.rct-hidden-dependency-start,
+.rct-hidden-dependency-finish {
+  position: absolute;
+  bottom: -4px;
+  width: 10px;
+  height: 10px;
+  background: gray;
+  border-radius: 5px;
+  border: 1px solid #fff; }
+
+.rct-hidden-dependency-start {
+  left: -5px; }
+
+.rct-hidden-dependency-finish {
+  right: -5px; }
