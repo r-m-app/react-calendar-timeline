@@ -128,10 +128,9 @@ export default class Items extends Component {
       groupOrders
     )
     const sortedDimensionItems = keyBy(dimensionItems, 'id')
-    const groupedDependencies = groupDependenciesByVisibleItems(
-      dependencies,
-      sortedDimensionItems
-    )
+    const groupedDependencies = dependencies
+      ? groupDependenciesByVisibleItems(dependencies, sortedDimensionItems)
+      : {}
 
     return (
       <div className="rct-items">
