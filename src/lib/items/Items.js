@@ -56,6 +56,7 @@ export default class Items extends Component {
     onDrawingFinish: PropTypes.func,
     onDependencyDraw: PropTypes.func,
     drawingPathColor: PropTypes.string,
+    selectedDependencyZIndex: PropTypes.number,
 
     itemRenderer: PropTypes.func,
     selected: PropTypes.array,
@@ -204,6 +205,7 @@ export default class Items extends Component {
                   fromDimensionItem={sortedDimensionItems[dependency.fromId]}
                   toDimensionItem={sortedDimensionItems[dependency.toId]}
                   onClick={this.props.onDependencyClick}
+                  selectedZIndex={this.props.selectedDependencyZIndex}
                 />
               )
             })}

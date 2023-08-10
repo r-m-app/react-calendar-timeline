@@ -76,6 +76,7 @@ export default class ReactCalendarTimeline extends Component {
     onDependencyClick: PropTypes.func,
     onDependencyDraw: PropTypes.func,
     drawingPathColor: PropTypes.string,
+    selectedDependencyZIndex: PropTypes.number,
 
     itemRenderer: PropTypes.func,
     groupRenderer: PropTypes.func,
@@ -821,6 +822,7 @@ export default class ReactCalendarTimeline extends Component {
         onDrawingFinish={this.handleDrawingFinish}
         onDependencyDraw={this.props.onDependencyDraw}
         drawingPathColor={this.props.drawingPathColor}
+        selectedDependencyZIndex={this.props.selectedDependencyZIndex}
         itemResizing={this.resizingItem}
         itemResized={this.resizedItem}
         itemRenderer={this.props.itemRenderer}

@@ -323,6 +323,7 @@ export default class App extends Component {
         onDependencyDraw={this.handleDependencyCreate}
         drawingPathColor="red"
         buffer={3}
+        selectedDependencyZIndex={80}
       >
         <TimelineMarkers>
           <TodayMarker />
