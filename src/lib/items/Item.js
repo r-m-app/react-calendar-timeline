@@ -126,6 +126,7 @@ export default class Item extends Component {
       nextProps.canResizeLeft !== this.props.canResizeLeft ||
       nextProps.canResizeRight !== this.props.canResizeRight ||
       nextProps.dimensions !== this.props.dimensions ||
+      nextProps.canDrawDependency !== this.props.canDrawDependency ||
       nextProps.hiddenDependencies !== this.props.hiddenDependencies
     return shouldUpdate
   }
@@ -518,6 +519,10 @@ export default class Item extends Component {
       ) {
         this.mountDrawDependency()
         drawDependencyMounted = true
+      }
+
+      if (!this.props.canDrawDependency && drawDependencyMounted) {
+        drawDependencyMounted = false
       }
 
       if (this.props.selected && !interactMounted) {

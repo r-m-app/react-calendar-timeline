@@ -190,7 +190,9 @@ export default class App extends Component {
       items,
       dependencies,
       defaultTimeStart,
-      defaultTimeEnd
+      defaultTimeEnd,
+      isDependenciesEnabled: true,
+      canDrawDependency: true
     }
   }
 
@@ -291,63 +293,91 @@ export default class App extends Component {
     const { groups, items, dependencies, defaultTimeStart, defaultTimeEnd } = this.state
 
     return (
-      <Timeline
-        groups={groups}
-        items={items}
-        dependencies={dependencies}
-        keys={keys}
-        sidebarWidth={150}
-        sidebarContent={<div>Above The Left</div>}
-        canMove
-        canResize="right"
-        canSelect
-        itemsSorted
-        itemTouchSendsClick={false}
-        stackItems
-        itemHeightRatio={0.75}
-        defaultTimeStart={defaultTimeStart}
-        defaultTimeEnd={defaultTimeEnd}
-        onCanvasClick={this.handleCanvasClick}
-        onCanvasDoubleClick={this.handleCanvasDoubleClick}
-        onCanvasContextMenu={this.handleCanvasContextMenu}
-        onItemClick={this.handleItemClick}
-        onItemSelect={this.handleItemSelect}
-        onItemContextMenu={this.handleItemContextMenu}
-        onItemMove={this.handleItemMove}
-        onItemResize={this.handleItemResize}
-        onItemDoubleClick={this.handleItemDoubleClick}
-        onTimeChange={this.handleTimeChange}
-        onZoom={this.handleZoom}
-        onDependencyClick={this.handleDependencyClick}
-        canDrawDependency={true}
-        onDependencyDraw={this.handleDependencyCreate}
-        drawingPathColor="red"
-        buffer={3}
-        selectedDependencyZIndex={80}
-      >
-        <TimelineMarkers>
-          <TodayMarker />
-          <CustomMarker
-            date={
-              moment()
-                .startOf('day')
-                .valueOf() +
-              1000 * 60 * 60 * 2
-            }
-          />
-          <CustomMarker
-            date={moment()
-              .add(3, 'day')
-              .valueOf()}
-          >
-            {({ styles }) => {
-              const newStyles = { ...styles, backgroundColor: 'blue' }
-              return <div style={newStyles} />
+      <>
+        <div>
+          <input
+            type="checkbox"
+            checked={this.state.isDependenciesEnabled}
+            onChange={() => {
+              console.log();
+              this.setState({ isDependenciesEnabled: !this.state.isDependenciesEnabled})
             }}
-          </CustomMarker>
-          <CursorMarker />
-        </TimelineMarkers>
-      </Timeline>
+          />
+          Dependencies enabled
+        </div>
+
+        {this.state.isDependenciesEnabled && (
+          <div>
+            <input
+              type="checkbox"
+              checked={this.state.canDrawDependency}
+              onChange={() => {
+                console.log();
+                this.setState({ canDrawDependency: !this.state.canDrawDependency})
+              }}
+            />
+            Can draw dependency
+          </div>
+        )}
+
+        <Timeline
+          groups={groups}
+          items={items}
+          dependencies={this.state.isDependenciesEnabled ? dependencies : undefined}
+          keys={keys}
+          sidebarWidth={150}
+          sidebarContent={<div>Above The Left</div>}
+          canMove
+          canResize="right"
+          canSelect
+          itemsSorted
+          itemTouchSendsClick={false}
+          stackItems
+          itemHeightRatio={0.75}
+          defaultTimeStart={defaultTimeStart}
+          defaultTimeEnd={defaultTimeEnd}
+          onCanvasClick={this.handleCanvasClick}
+          onCanvasDoubleClick={this.handleCanvasDoubleClick}
+          onCanvasContextMenu={this.handleCanvasContextMenu}
+          onItemClick={this.handleItemClick}
+          onItemSelect={this.handleItemSelect}
+          onItemContextMenu={this.handleItemContextMenu}
+          onItemMove={this.handleItemMove}
+          onItemResize={this.handleItemResize}
+          onItemDoubleClick={this.handleItemDoubleClick}
+          onTimeChange={this.handleTimeChange}
+          onZoom={this.handleZoom}
+          onDependencyClick={this.handleDependencyClick}
+          canDrawDependency={this.state.isDependenciesEnabled && this.state.canDrawDependency}
+          onDependencyDraw={this.handleDependencyCreate}
+          drawingPathColor="red"
+          buffer={3}
+          selectedDependencyZIndex={80}
+        >
+          <TimelineMarkers>
+            <TodayMarker />
+            <CustomMarker
+              date={
+                moment()
+                  .startOf('day')
+                  .valueOf() +
+                1000 * 60 * 60 * 2
+              }
+            />
+            <CustomMarker
+              date={moment()
+                .add(3, 'day')
+                .valueOf()}
+            >
+              {({ styles }) => {
+                const newStyles = { ...styles, backgroundColor: 'blue' }
+                return <div style={newStyles} />
+              }}
+            </CustomMarker>
+            <CursorMarker />
+          </TimelineMarkers>
+        </Timeline>
+      </>
     )
   }
 }
