@@ -10,7 +10,6 @@ export const defaultItemRenderer = ({
   getDropProps,
   hiddenDependencies
 }) => {
-  console.log('hiddenDependencies', hiddenDependencies, item.id)
   const { left: leftResizeProps, right: rightResizeProps } = getResizeProps()
   const { left: leftDropProps, right: rightDropProps } = getDropProps()
   const { left: leftDrawProps, right: rightDrawProps } = getDrawProps()
