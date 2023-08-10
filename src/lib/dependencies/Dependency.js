@@ -7,6 +7,7 @@ class Dependency extends React.PureComponent {
     dependency: PropTypes.object,
     fromDimensionItem: PropTypes.object,
     toDimensionItem: PropTypes.object,
+    selectedZIndex: PropTypes.number,
 
     onClick: PropTypes.func
   }
@@ -41,7 +42,13 @@ class Dependency extends React.PureComponent {
     )
     const dX = 80
     const dY = 14
-    const svgStyles = calculateSvgStyles(coords, dX, dY, this.state.isSelected)
+    const svgStyles = calculateSvgStyles(
+      coords,
+      dX,
+      dY,
+      this.state.isSelected,
+      this.props.selectedZIndex
+    )
     const pathId = `${fromId}-${fromSide}_${toId}-${toSide}`
     const d = drawDependencyPath(
       coords,
@@ -111,7 +118,13 @@ function calculatePathCoords(fromItem, toItem, fromSide, toSide) {
   return { X1, Y1, X2, Y2 }
 }
 
-function calculateSvgStyles({ X1, Y1, X2, Y2 }, dX, dY, isSelected) {
+function calculateSvgStyles(
+  { X1, Y1, X2, Y2 },
+  dX,
+  dY,
+  isSelected,
+  selectedZIndex = 90
+) {
   const width = Math.abs(X1 - X2) + dX * 2
 
   return {
@@ -119,7 +132,7 @@ function calculateSvgStyles({ X1, Y1, X2, Y2 }, dX, dY, isSelected) {
     top: Math.min(Y1, Y2) - dY,
     width,
     height: Math.abs(Y1 - Y2) + dY * 2,
-    zIndex: isSelected ? 990 : undefined
+    zIndex: isSelected ? selectedZIndex : undefined
   }
 }
 
